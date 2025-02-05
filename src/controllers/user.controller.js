@@ -11,17 +11,17 @@ const registerUser=asyncHandler(async(req,res)=>{
     // });
 
     const {userName, fullName, password, email}= req.body;
-    console.log("email", email);
-    console.log("username", userName);
-    console.log("FullName", fullName);
-    console.log("password",password);
-    
+    // console.log("email", email);
+    // console.log("username", userName);
+    // console.log("FullName", fullName);
+    // console.log("password",password);
+    // console.log(req.files)
     if([fullName, password, userName, email].some((field)=>field?.trim()=="")){
         throw new apiError(400, "All fields are required!!!")
     }
     
 
-    const existedUser= User.findOne({
+    const existedUser= await User.findOne({
         $or:[{userName},{email}]
     })
 
@@ -30,7 +30,16 @@ const registerUser=asyncHandler(async(req,res)=>{
     }
 
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    // // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+    // let avatarLocalPath;
+    // if(req.files && Array.isArray(req.files.avatar) && req.files.avatar.length>0){
+    //     avatarLocalPath=req.files.avatar[0].path;
+    // }
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0){
+        coverImageLocalPath=req.files.coverImage[0].path;
+    }
 
     if(!avatarLocalPath){
         throw new apiError(400, "Avatar is required!!")
@@ -44,7 +53,7 @@ const registerUser=asyncHandler(async(req,res)=>{
         throw new apiError (400, "Avatar is required")
     }
 
-    const User= await User.create({
+    const Users= await User.create({
         fullName,
         avatar: avatar.url,
         coverImage:coverImage?.url|| "",
@@ -53,7 +62,7 @@ const registerUser=asyncHandler(async(req,res)=>{
         userName: userName.toLowerCase()
     })
 
-    const createdUser= await User.findById(User._id).select(
+    const createdUser= await User.findById(Users._id).select(
         "-password -refreshToken"
     )
 

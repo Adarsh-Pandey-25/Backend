@@ -6,11 +6,6 @@ import connectDB from "./db/index.js";
 dotenv.config({
     path: '.env'
 })
-app.on("error",(error)=>{
-    console.log("ERROR: ", error);
-    throw error;
-    
-})
 
 connectDB()
 
@@ -26,5 +21,10 @@ connectDB()
     
 })
 
+app.on("error",(error)=>{
+    console.log("ERROR: ", error);
+    throw error;
+    
+})
 
 
